@@ -6,6 +6,7 @@ import authRoutes from './routes/auth';
 import usersRoutes from './routes/users';
 import profilesRoutes from './routes/profiles';
 import tendersRoutes from './routes/tenders';
+import dashboardRoutes from './routes/dashboard';
 import swaggerPlugin from './plugins/swagger';
 import jwtPlugin from './plugins/jwt';
 
@@ -28,6 +29,7 @@ app.register(authRoutes, { prefix: '/api/auth' });
 app.register(usersRoutes, { prefix: '/api/users' });
 app.register(profilesRoutes, { prefix: '/api/search-profiles' });
 app.register(tendersRoutes, { prefix: '/api/tenders' });
+app.register(dashboardRoutes, { prefix: '/api/dashboard' });
 
 app.get('/health', async () => {
   return { status: 'ok' };

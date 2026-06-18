@@ -1,6 +1,9 @@
 import { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { PrismaClient } from '@tender/database';
+
+const prisma = new PrismaClient();
 
 const profilesRoutes: FastifyPluginAsync = async (fastify) => {
   const server = fastify.withTypeProvider<ZodTypeProvider>();
@@ -8,10 +11,17 @@ const profilesRoutes: FastifyPluginAsync = async (fastify) => {
   server.get(
     '/',
     {
-      preValidation: [fastify.authenticate],
+      // preValidation: [fastify.authenticate],
     },
-    async () => {
-      return [];
+    async (request) => {
+      const user = await prisma.user.findFirst();
+      if (!user) return { items: [] };
+
+      const items = await prisma.searchProfile.findMany({
+        where: { userId: user.id },
+      });
+
+      return { items };
     }
   );
 
