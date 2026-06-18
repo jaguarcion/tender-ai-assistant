@@ -1,0 +1,9 @@
+{
+  "name": "@tender/tender-sources",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@tender/shared": "*",
+    "@tender/database": "*"
+  }
+}

@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: tender-postgres-prod
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tender_db
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: tender-redis-prod
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data_prod:/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: tender-api-prod
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:4000:4000"
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    container_name: tender-bot-prod
+    depends_on:
+      - postgres
+      - redis
+      - api
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    container_name: tender-worker-prod
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: tender-web-prod
+    depends_on:
+      - api
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
